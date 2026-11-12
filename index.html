@@ -2,12 +2,15 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Spese">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#e9eaee" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0c0e" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png?v=4">
+<link rel="icon" href="icon-192.png">
 <title>Spese</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
 <style>
@@ -32,11 +35,11 @@ input,textarea{font:inherit;color:var(--ink);background:var(--bg);border:0;borde
 .amtbox{display:flex;align-items:baseline;gap:6px;padding:0 4px}.amtbox span{font-size:34px;font-weight:600;color:var(--mute)}
 #amt{font-size:64px;font-weight:800;background:none;padding:0;letter-spacing:-.04em;border-radius:0}
 .dev{background:var(--dark);color:var(--ink);border-radius:34px;padding:12px 16px 14px;margin:12px 0}
-.wv{position:relative}.band{position:absolute;left:0;right:0;top:88px;height:44px;border-radius:22px;pointer-events:none;transition:background .2s}
+.wv{position:relative}.band{position:absolute;left:0;right:0;top:76px;height:38px;border-radius:19px;pointer-events:none;transition:background .2s}
 .band.n{background:var(--bn)}.band.s{background:var(--bs)}
-.wheel{height:220px;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;position:relative;-webkit-mask-image:linear-gradient(transparent,#000 28%,#000 72%,transparent);mask-image:linear-gradient(transparent,#000 28%,#000 72%,transparent)}
-.wheel::-webkit-scrollbar{display:none}.wp{height:88px}
-.wi{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-size:19px;font-weight:600;opacity:.45;cursor:pointer}.wi.on{opacity:1;font-size:24px;font-weight:800;color:#fff}
+.wheel{height:190px;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;position:relative;-webkit-mask-image:linear-gradient(transparent,#000 28%,#000 72%,transparent);mask-image:linear-gradient(transparent,#000 28%,#000 72%,transparent)}
+.wheel::-webkit-scrollbar{display:none}.wp{height:76px}
+.wi{height:38px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-size:17px;font-weight:600;opacity:.45;cursor:pointer}.wi.on{opacity:1;font-size:21px;font-weight:800;color:#fff}
 .hint{text-align:center;font-size:13px;opacity:.75;margin-top:8px;min-height:20px}
 .row2{display:flex;gap:10px;margin-bottom:12px}
 .dchip{position:relative;flex:none;display:grid;place-items:center;padding:0 20px;border-radius:16px;background:var(--card);font-weight:700}.dchip input{position:absolute;inset:0;opacity:0;width:100%}
@@ -86,9 +89,13 @@ button{transition:transform .25s cubic-bezier(.2,.8,.2,1),background-color .2s,o
 @keyframes pp{40%{transform:scale(1.05)}}
 @keyframes ti{from{opacity:0;transform:translate(-50%,-24px) scale(.9)}}
 @media (prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;transition:none!important}}
-.top{display:flex;flex-direction:column;min-height:calc(100svh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 30px - 100px)}
-.amtw{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:90px}
-.top .dev{margin:8px 0 14px}.top .row2{margin-bottom:14px}.top .add{margin-bottom:0}
+.top{display:block}
+.top .hd{margin:2px 4px 10px}.top .seg{margin-bottom:8px}
+.amtw{padding:0 0 2px}.top .amtbox span{font-size:28px}.top #amt{font-size:52px}.top #pv{min-height:16px!important;font-size:12px}
+.top .dev{margin:6px 0 10px;padding:8px 14px 10px}.top .hint{margin-top:4px;min-height:18px}
+.top .row2{margin-bottom:10px}.top .row2 input{padding:10px 14px}.top .add{margin-bottom:0;height:54px}
+html{touch-action:pan-x pan-y}
+.top .add{display:flex;align-items:center;justify-content:center;width:fit-content;min-width:200px;padding:0 44px;margin:16px auto 0}
 </style>
 </head>
 <body>
@@ -172,18 +179,10 @@ return `${ys.length>1?`<div class="chips">${ys.slice().reverse().map(y=>`<button
 <div class="kv"><span>Liquidità totale</span><b>${eur(p.liq)}</b></div>
 <div class="kv"><span>Capitale investito</span><b>${eur(p.cap)}</b></div>
 <button class="kv" style="width:100%;text-align:left" data-a="tab" data-t="inv"><span>${PY==cy()?'Valore investimento attuale':'Valore a fine '+PY} ›</span><b>${eur(p.val)}</b></button></div>`}
-function chart(p){if(!p.length)return `<p class="mute">Aggiungi un acquisto o un aggiornamento per vedere il grafico.</p>`;
-const qc=[],qv=[];let hv=false;
-p.forEach((x,i)=>{const d=x.e.d;if(x.e.t=='buy'&&i>0)qc.push({d,y:p[i-1].cap});qc.push({d,y:x.cap});
-if(x.e.t=='val'){hv=true;qv.push({d,y:x.val,dot:1})}else if(!hv){if(i>0)qv.push({d,y:p[i-1].val});qv.push({d,y:x.val,dot:1})}});
-const T=d=>Date.UTC(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8)),t0=T(p[0].e.d),t1=T(p[p.length-1].e.d);
-const all=[...qc,...qv].map(x=>x.y);let lo=Math.min(...all),hi=Math.max(...all);if(hi==lo){hi+=1;lo-=1}const g=(hi-lo)*.15;lo-=g;hi+=g;
-const W=320,H=150,X=x=>t1>t0?12+(T(x.d)-t0)/(t1-t0)*(W-24):W/2,Yy=y=>H-14-(y-lo)/(hi-lo)*(H-28),pl=q=>q.map(x=>`${X(x)},${Yy(x.y)}`).join(' ');
-return `<svg viewBox="0 0 ${W} ${H+16}" class="ch" role="img" aria-label="Andamento investimenti"><polyline points="${pl(qc)}" class="cl" fill="none"/><polyline points="${pl(qv)}" class="ln"/>${qv.filter(x=>x.dot).map(x=>`<circle cx="${X(x)}" cy="${Yy(x.y)}" r="3.5" class="dt"/>`).join('')}<text x="12" y="${H+12}" class="tx">${lab(p[0].e.d.slice(0,7))}</text><text x="${W-12}" y="${H+12}" text-anchor="end" class="tx">${lab(p[p.length-1].e.d.slice(0,7))}</text></svg><p class="mute">Linea piena: valore. Tratteggiata: capitale investito.</p>`}
 function vInv(){const r=replay(),la=r.pts[r.pts.length-1],need=la&&la.e.t=='buy'&&r.pts.some(x=>x.e.t=='val')?`<p class="mute" style="margin:-6px 4px 14px">Hai fatto un acquisto dopo l’ultimo aggiornamento: inserisci il nuovo valore.</p>`:'',lv=[...r.pts].reverse().find(x=>x.e.t=='val'),bc=lv?lv.cap:r.cap,g=r.val-bc,pc=bc>0?(g/bc*100).toFixed(1).replace('.',','):'0',v=G.f=='val',sp=G.m=='pct';
 return `<header class="hd"><div><div class="mute">Investimenti</div><h1 class="big" data-v="${r.val}">${eur(r.val)}</h1></div></header>
 <p class="mute" style="margin:-8px 4px 14px">Capitale ${eur(r.cap)} · <b class="${g<0?'bad':'pos'}">${g>0?'+':''}${eur(g)} (${pc}%)</b></p>
-${need}<div class="card">${chart(r.pts)}</div>
+${need}
 <div class="seg"><button class="${v?'on':''}" data-a="fm" data-v="val">Aggiorna valore</button><button class="${v?'':'on'}" data-a="fm" data-v="buy">Nuovo acquisto</button></div>
 ${v?`<div class="card"><div class="row2"><input id="vv" inputmode="decimal" placeholder="${sp?'Rendimento, es. 5,2':'€ valore totale'}" value="${esc(G.v)}" aria-label="Valore"><input id="vd" type="date" max="${today()}" value="${G.vd}" aria-label="Data" style="width:150px"></div><div class="mute" id="vp" style="margin-bottom:10px;min-height:18px"></div><button class="go" data-a="val">Salva aggiornamento</button></div>`
 :`<div class="card"><div class="row2"><input id="ba" inputmode="decimal" placeholder="€ importo" value="${esc(G.a)}" aria-label="Importo"><input id="bdt" type="date" max="${today()}" value="${G.d}" aria-label="Data" style="width:150px"></div>
@@ -198,9 +197,9 @@ ${CP?`<p class="mute">Copia non riuscita: seleziona e copia a mano.</p><textarea
 const enc=()=>btoa(unescape(encodeURIComponent(JSON.stringify(S))));
 async function copy(t){try{await navigator.clipboard.writeText(t);return true}catch(e){try{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();const ok=document.execCommand('copy');a.remove();return ok}catch(x){return false}}}
 function toast(m){const e=document.createElement('div');e.id='toast';e.textContent=m;document.body.appendChild(e);setTimeout(()=>{e.style.transition='opacity .3s,transform .3s';e.style.opacity=0;e.style.transform='translateX(-50%) translateY(-10px)'},1500);setTimeout(()=>e.remove(),1850)}
-function initWheel(){const w=$('#wh');if(!w)return;const it=[...w.querySelectorAll('.wi')];w.style.scrollBehavior='auto';w.scrollTop=ALL.indexOf(F.c)*44;let raf;
-w.addEventListener('scroll',()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{const i=Math.max(0,Math.min(ALL.length-1,Math.round(w.scrollTop/44)));if(ALL[i]!=F.c){F.c=ALL[i];it.forEach((x,j)=>x.classList.toggle('on',j==i));$('#band').className='band '+(CATS.nec.includes(F.c)?'n':'s');$('#hint').textContent=hintTxt()}})});
-it.forEach((x,i)=>x.onclick=()=>{w.style.scrollBehavior='smooth';w.scrollTo({top:i*44})})}
+function initWheel(){const w=$('#wh');if(!w)return;const it=[...w.querySelectorAll('.wi')];w.style.scrollBehavior='auto';w.scrollTop=ALL.indexOf(F.c)*38;let raf;
+w.addEventListener('scroll',()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{const i=Math.max(0,Math.min(ALL.length-1,Math.round(w.scrollTop/38)));if(ALL[i]!=F.c){F.c=ALL[i];it.forEach((x,j)=>x.classList.toggle('on',j==i));$('#band').className='band '+(CATS.nec.includes(F.c)?'n':'s');$('#hint').textContent=hintTxt()}})});
+it.forEach((x,i)=>x.onclick=()=>{w.style.scrollBehavior='smooth';w.scrollTo({top:i*38})})}
 function pos(){const nb=document.querySelector('.tb.on'),i=$('#tabs .ind');if(!i)return;if(nb){i.style.opacity=1;i.style.width=nb.offsetWidth+'px';i.style.transform=`translateX(${nb.offsetLeft}px)`}else i.style.opacity=0}
 let tk=0;function pg(){const t=$('.top'),b=$('.below');if(!t||!b)return;const mx=b.offsetTop-40,p=Math.max(0,Math.min(1,mx>0?scrollY/mx:0)),q=Math.max(0,Math.min(1,(p-.25)/.75));
 t.style.opacity=1-Math.min(1,p*1.3);t.style.transform=`translateY(${-p*30}px) scale(${1-.06*p})`;t.style.pointerEvents=p>.5?'none':'';
@@ -243,7 +242,9 @@ if(t.id=='dt'){F.d=t.value||today();$('#dl').textContent=dl(F.d);const h=$('#hin
 else if(t.id=='bdt')G.d=t.value||today();else if(t.id=='vd')G.vd=t.value||today();else if(t.id=='bn')G.nl=t.checked;
 else if(t.id=='base'){const n=num(t.value);S.base=isNaN(n)?0:n;save();render()}});
 addEventListener('scroll',()=>{cancelAnimationFrame(tk);tk=requestAnimationFrame(pg)},{passive:true});addEventListener('load',pos);addEventListener('resize',pos);
+['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
 render();
 </script>
+<script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script>
 </body>
 </html>
