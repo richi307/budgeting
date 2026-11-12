@@ -8,9 +8,6 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#e9eaee" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0c0e" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-180.png?v=4">
-<link rel="icon" href="icon-192.png">
 <title>Spese</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
 <style>
@@ -67,14 +64,10 @@ input,textarea{font:inherit;color:var(--ink);background:var(--bg);border:0;borde
 .tb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0 6px;border-radius:28px;font-size:10px;letter-spacing:-.01em;min-width:0;font-weight:700;color:var(--mute)}
 .tb svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.tb.on{color:var(--ink);background:var(--hi);box-shadow:inset 0 0 0 1px var(--hi),0 2px 8px rgba(0,0,0,.08)}
 #toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--btn);color:var(--btnt);padding:10px 18px;border-radius:999px;font-weight:700;font-size:14px;z-index:30}
-.top{min-height:calc(100svh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 30px - 70px);display:flex;flex-direction:column;justify-content:space-between}.top .add{margin-bottom:26px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:calc(env(safe-area-inset-top,0px) + 14px);background:linear-gradient(var(--bg) calc(100% - 14px),transparent);z-index:20;pointer-events:none}
 main{padding-top:30px}
 button{transition:transform .25s cubic-bezier(.2,.8,.2,1),background-color .2s,opacity .2s}button:active{transform:scale(.95)}
 .add{width:100%;height:60px;border-radius:30px;font-size:18px;font-weight:800;line-height:1;padding:0}
-html.snap{scroll-snap-type:y mandatory}
-.top{scroll-snap-align:start;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 30px);will-change:transform,opacity}
-.below{scroll-snap-align:start;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 16px);min-height:calc(100svh - env(safe-area-inset-top,0px) - 16px);padding-top:8px;opacity:0;will-change:transform,opacity}
 .ind{position:absolute;top:6px;bottom:6px;left:0;width:0;border-radius:28px;background:var(--hi);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 0 0 1px var(--hi),0 4px 14px rgba(0,0,0,.1);backdrop-filter:blur(8px) saturate(170%);-webkit-backdrop-filter:blur(8px) saturate(170%);opacity:0;pointer-events:none}
 .ind.rdy{transition:transform .55s cubic-bezier(.3,1.35,.5,1),width .55s cubic-bezier(.3,1.35,.5,1),opacity .2s}
 .tb{position:relative;z-index:1}.tb.on{background:none;box-shadow:none}.tb.on svg{animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
@@ -93,6 +86,9 @@ html.snap{scroll-snap-type:y mandatory}
 @keyframes pp{40%{transform:scale(1.05)}}
 @keyframes ti{from{opacity:0;transform:translate(-50%,-24px) scale(.9)}}
 @media (prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;transition:none!important}}
+.top{display:flex;flex-direction:column;min-height:calc(100svh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 30px - 100px)}
+.amtw{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:90px}
+.top .dev{margin:8px 0 14px}.top .row2{margin-bottom:14px}.top .add{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -132,8 +128,8 @@ const bar=(k,l,v,t,b)=>`<div class="br"><div class="rw"><span>${l}</span><b clas
 const bars=s=>{const b=bad(s);return (s.ent>0?'':`<p class="mute">Aggiungi le entrate del mese per calcolare gli obiettivi.</p>`)+bar('nec','Necessità 50%',s.nec,s.ent*.5,b.nec)+bar('sva','Svago 30%',s.sva,s.ent*.3,b.sva)+bar('ris','Risparmi 20%',s.ris,s.ent*.2,b.ris)};
 const items=s=>[...s.T.map(t=>({...t,k:'tx'})),...s.I.map(t=>({...t,k:'inc',c:'Entrata'}))].sort((a,b)=>b.d.localeCompare(a.d)||b.id-a.id);
 const list=arr=>arr.length?arr.map(t=>`<div class="li"><div class="g"><div>${t.c}${t.n?` <span class="mute">${esc(t.n)}</span>`:''}</div><div class="mute">${t.d.slice(8)}/${t.d.slice(5,7)}</div></div><b class="${t.k=='inc'?'pos':''}">${t.k=='inc'?'+':''}${eur(t.a)}</b><button class="x" aria-label="Elimina" data-a="del" data-k="${t.k}" data-id="${t.id}">✕</button></div>`).join(''):`<p class="mute">Ancora nessun movimento.</p>`;
-function replay(u){const ev=S.ev.slice().sort((a,b)=>a.d.localeCompare(b.d)||a.id-b.id);let cap=0,val=0;const pts=[];
-for(const e of ev){if(u&&e.d>u)break;if(e.t=='buy'){cap+=e.a;val+=e.a}else val=e.pct!=null?cap*(1+e.pct/100):e.v;pts.push({e,cap,val})}return{cap,val,pts}}
+function replay(u){const ev=S.ev.slice().sort((a,b)=>a.d.localeCompare(b.d)||a.id-b.id);let cap=0,val=0,hv=false;const pts=[];
+for(const e of ev){if(u&&e.d>u)break;if(e.t=='buy'){cap+=e.a;if(!hv)val+=e.a}else{hv=true;val=e.pct!=null?cap*(1+e.pct/100):e.v}pts.push({e,cap,val})}return{cap,val,pts}}
 /* anni: dal primo con spese/entrate fino a quello corrente */
 function yrs(){const c=cy();let f=c;[...S.tx,...S.inc].forEach(x=>f=Math.min(f,+x.d.slice(0,4)));const r=[];for(let y=f;y<=c;y++)r.push(y);return r}
 /* patrimonio: gli acquisti di investimenti scalano solo la liquidità pregressa */
@@ -150,12 +146,11 @@ const dl=d=>d==today()?'Oggi':`${+d.slice(8)} ${MESI[+d.slice(5,7)-1].slice(0,3)
 function vOggi(){const n=new Date(),s=st(n.getFullYear(),n.getMonth()),sp=F.t=='spesa';
 return `<div class="top"><header class="hd"><div class="mute" style="font-size:15px;font-weight:600">${MESI[n.getMonth()]} ${n.getFullYear()}</div></header>
 <div class="seg"><button class="${sp?'on':''}" data-a="t" data-v="spesa">Spesa</button><button class="${sp?'':'on'}" data-a="t" data-v="entrata">Entrata</button></div>
-<div class="amtbox"><span>€</span><input id="amt" inputmode="decimal" placeholder="0" value="${esc(F.a)}" aria-label="Importo"></div><div class="mute" id="pv" style="padding:0 4px;min-height:20px"></div>
-${sp?`<div class="dev"><div class="wv"><div class="band ${CATS.nec.includes(F.c)?'n':'s'}" id="band"></div><div class="wheel" id="wh"><div class="wp"></div>${ALL.map(c=>`<div class="wi ${c==F.c?'on':''}">${c}</div>`).join('')}<div class="wp"></div></div></div><div class="hint" id="hint">${esc(hintTxt())}</div></div>`:'<div style="height:12px"></div>'}
+<div class="amtw"><div class="amtbox"><span>€</span><input id="amt" inputmode="decimal" placeholder="0" value="${esc(F.a)}" aria-label="Importo"></div><div class="mute" id="pv" style="padding:0 4px;min-height:20px"></div></div>
+${sp?`<div class="dev"><div class="wv"><div class="band ${CATS.nec.includes(F.c)?'n':'s'}" id="band"></div><div class="wheel" id="wh"><div class="wp"></div>${ALL.map(c=>`<div class="wi ${c==F.c?'on':''}">${c}</div>`).join('')}<div class="wp"></div></div></div><div class="hint" id="hint">${esc(hintTxt())}</div></div>`:''}
 <div class="row2"><label class="dchip"><span id="dl">${dl(F.d)}</span><input id="dt" type="date" max="${today()}" value="${F.d}" aria-label="Data"></label><input id="nt" placeholder="Nota (facoltativa)" value="${esc(F.n)}"></div>
 <button class="add" data-a="add">Aggiungi</button>
-</div><div class="below"><div class="card"><h2>Obiettivi del mese</h2>${bars(s)}<div class="kv"><span class="mute">Entrate</span><b>${eur(s.ent)}</b></div></div>
-<div class="card"><h2>Ultimi movimenti</h2>${list(items(s).slice(0,4))}</div></div>`}
+</div>`}
 function vAnno(){const ys=yrs(),t=[0,0,0];
 const rows=MESI.map((m,i)=>{const s=st(Y,i),b=bad(s);t[0]+=s.ent;t[1]+=s.nec+s.sva;t[2]+=s.ris;return `<button class="mrow ${s.has?'':'emp'}" data-a="mese" data-m="${i}"><div class="mh"><b>${m}</b><span class="mute">Entrate ${eur(s.ent)}</span></div><div class="ps"><span class="pill n ${b.nec?'bd':''}">${eur(s.nec)}</span><span class="pill s ${b.sva?'bd':''}">${eur(s.sva)}</span><span class="pill r ${b.ris?'bd':''}">${eur(s.ris)}</span></div></button>`}).join('');
 return `<header class="hd"><h1>${Y}</h1></header>${ys.length>1?`<div class="chips">${ys.slice().reverse().map(y=>`<button class="chip ${y==Y?'on':''}" data-a="yr" data-y="${y}">${y}</button>`).join('')}</div>`:''}
@@ -178,13 +173,17 @@ return `${ys.length>1?`<div class="chips">${ys.slice().reverse().map(y=>`<button
 <div class="kv"><span>Capitale investito</span><b>${eur(p.cap)}</b></div>
 <button class="kv" style="width:100%;text-align:left" data-a="tab" data-t="inv"><span>${PY==cy()?'Valore investimento attuale':'Valore a fine '+PY} ›</span><b>${eur(p.val)}</b></button></div>`}
 function chart(p){if(!p.length)return `<p class="mute">Aggiungi un acquisto o un aggiornamento per vedere il grafico.</p>`;
-const all=p.flatMap(x=>[x.cap,x.val]);let lo=Math.min(...all),hi=Math.max(...all);if(hi==lo){hi+=1;lo-=1}const q=(hi-lo)*.15;lo-=q;hi+=q;
-const W=320,H=150,X=i=>p.length<2?W/2:12+i*(W-24)/(p.length-1),Yy=y=>H-14-(y-lo)/(hi-lo)*(H-28),pl=k=>p.map((x,i)=>`${X(i)},${Yy(x[k])}`).join(' ');
-return `<svg viewBox="0 0 ${W} ${H+16}" class="ch" role="img" aria-label="Andamento investimenti"><polyline points="${pl('cap')}" class="cl" fill="none"/><polyline points="${pl('val')}" class="ln"/>${p.map((x,i)=>`<circle cx="${X(i)}" cy="${Yy(x.val)}" r="3.5" class="dt"/>`).join('')}<text x="12" y="${H+12}" class="tx">${lab(p[0].e.d.slice(0,7))}</text><text x="${W-12}" y="${H+12}" text-anchor="end" class="tx">${lab(p[p.length-1].e.d.slice(0,7))}</text></svg><p class="mute">Linea piena: valore. Tratteggiata: capitale investito.</p>`}
-function vInv(){const r=replay(),g=r.val-r.cap,pc=r.cap>0?(g/r.cap*100).toFixed(1).replace('.',','):'0',v=G.f=='val',sp=G.m=='pct';
+const qc=[],qv=[];let hv=false;
+p.forEach((x,i)=>{const d=x.e.d;if(x.e.t=='buy'&&i>0)qc.push({d,y:p[i-1].cap});qc.push({d,y:x.cap});
+if(x.e.t=='val'){hv=true;qv.push({d,y:x.val,dot:1})}else if(!hv){if(i>0)qv.push({d,y:p[i-1].val});qv.push({d,y:x.val,dot:1})}});
+const T=d=>Date.UTC(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8)),t0=T(p[0].e.d),t1=T(p[p.length-1].e.d);
+const all=[...qc,...qv].map(x=>x.y);let lo=Math.min(...all),hi=Math.max(...all);if(hi==lo){hi+=1;lo-=1}const g=(hi-lo)*.15;lo-=g;hi+=g;
+const W=320,H=150,X=x=>t1>t0?12+(T(x.d)-t0)/(t1-t0)*(W-24):W/2,Yy=y=>H-14-(y-lo)/(hi-lo)*(H-28),pl=q=>q.map(x=>`${X(x)},${Yy(x.y)}`).join(' ');
+return `<svg viewBox="0 0 ${W} ${H+16}" class="ch" role="img" aria-label="Andamento investimenti"><polyline points="${pl(qc)}" class="cl" fill="none"/><polyline points="${pl(qv)}" class="ln"/>${qv.filter(x=>x.dot).map(x=>`<circle cx="${X(x)}" cy="${Yy(x.y)}" r="3.5" class="dt"/>`).join('')}<text x="12" y="${H+12}" class="tx">${lab(p[0].e.d.slice(0,7))}</text><text x="${W-12}" y="${H+12}" text-anchor="end" class="tx">${lab(p[p.length-1].e.d.slice(0,7))}</text></svg><p class="mute">Linea piena: valore. Tratteggiata: capitale investito.</p>`}
+function vInv(){const r=replay(),la=r.pts[r.pts.length-1],need=la&&la.e.t=='buy'&&r.pts.some(x=>x.e.t=='val')?`<p class="mute" style="margin:-6px 4px 14px">Hai fatto un acquisto dopo l’ultimo aggiornamento: inserisci il nuovo valore.</p>`:'',lv=[...r.pts].reverse().find(x=>x.e.t=='val'),bc=lv?lv.cap:r.cap,g=r.val-bc,pc=bc>0?(g/bc*100).toFixed(1).replace('.',','):'0',v=G.f=='val',sp=G.m=='pct';
 return `<header class="hd"><div><div class="mute">Investimenti</div><h1 class="big" data-v="${r.val}">${eur(r.val)}</h1></div></header>
 <p class="mute" style="margin:-8px 4px 14px">Capitale ${eur(r.cap)} · <b class="${g<0?'bad':'pos'}">${g>0?'+':''}${eur(g)} (${pc}%)</b></p>
-<div class="card">${chart(r.pts)}</div>
+${need}<div class="card">${chart(r.pts)}</div>
 <div class="seg"><button class="${v?'on':''}" data-a="fm" data-v="val">Aggiorna valore</button><button class="${v?'':'on'}" data-a="fm" data-v="buy">Nuovo acquisto</button></div>
 ${v?`<div class="card"><div class="row2"><input id="vv" inputmode="decimal" placeholder="${sp?'Rendimento, es. 5,2':'€ valore totale'}" value="${esc(G.v)}" aria-label="Valore"><input id="vd" type="date" max="${today()}" value="${G.vd}" aria-label="Data" style="width:150px"></div><div class="mute" id="vp" style="margin-bottom:10px;min-height:18px"></div><button class="go" data-a="val">Salva aggiornamento</button></div>`
 :`<div class="card"><div class="row2"><input id="ba" inputmode="decimal" placeholder="€ importo" value="${esc(G.a)}" aria-label="Importo"><input id="bdt" type="date" max="${today()}" value="${G.d}" aria-label="Data" style="width:150px"></div>
@@ -203,7 +202,7 @@ function initWheel(){const w=$('#wh');if(!w)return;const it=[...w.querySelectorA
 w.addEventListener('scroll',()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{const i=Math.max(0,Math.min(ALL.length-1,Math.round(w.scrollTop/44)));if(ALL[i]!=F.c){F.c=ALL[i];it.forEach((x,j)=>x.classList.toggle('on',j==i));$('#band').className='band '+(CATS.nec.includes(F.c)?'n':'s');$('#hint').textContent=hintTxt()}})});
 it.forEach((x,i)=>x.onclick=()=>{w.style.scrollBehavior='smooth';w.scrollTo({top:i*44})})}
 function pos(){const nb=document.querySelector('.tb.on'),i=$('#tabs .ind');if(!i)return;if(nb){i.style.opacity=1;i.style.width=nb.offsetWidth+'px';i.style.transform=`translateX(${nb.offsetLeft}px)`}else i.style.opacity=0}
-let tk=0;function pg(){const t=$('.top'),b=$('.below');if(!t||!b)return;const mx=b.offsetTop-16,p=Math.max(0,Math.min(1,mx>0?scrollY/mx:0)),q=Math.max(0,Math.min(1,(p-.25)/.75));
+let tk=0;function pg(){const t=$('.top'),b=$('.below');if(!t||!b)return;const mx=b.offsetTop-40,p=Math.max(0,Math.min(1,mx>0?scrollY/mx:0)),q=Math.max(0,Math.min(1,(p-.25)/.75));
 t.style.opacity=1-Math.min(1,p*1.3);t.style.transform=`translateY(${-p*30}px) scale(${1-.06*p})`;t.style.pointerEvents=p>.5?'none':'';
 b.style.opacity=q;b.style.transform=`translateY(${(1-q)*50}px) scale(${.96+.04*q})`;b.style.pointerEvents=q<.5?'none':''}
 function countUp(){document.querySelectorAll('.big[data-v]').forEach(e=>{const v=+e.dataset.v,t0=performance.now(),f=n=>{const k=Math.min(1,(n-t0)/700);e.textContent=eur(v*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)})}
@@ -246,6 +245,5 @@ else if(t.id=='base'){const n=num(t.value);S.base=isNaN(n)?0:n;save();render()}}
 addEventListener('scroll',()=>{cancelAnimationFrame(tk);tk=requestAnimationFrame(pg)},{passive:true});addEventListener('load',pos);addEventListener('resize',pos);
 render();
 </script>
-<script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script>
 </body>
 </html>
