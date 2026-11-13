@@ -14,10 +14,10 @@
 <title>Spese</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#e9eaee;--card:#f8f8fa;--ink:#0f1114;--mute:#6a707b;--line:rgba(15,17,20,.08);--dark:#f8f8fa;--bn:#3d6bff;--bs:#ff4d2e;--acc:#ff4d2e;--n:#3d6bff;--s:#bd6f00;--r:#0f9a5e;--bad:#e5322d;--glass:rgba(248,248,250,.5);--hi:rgba(255,255,255,.75);--btn:#0f1114;--btnt:#fff;
+:root{--bg:#e9eaee;--card:#f8f8fa;--ink:#0f1114;--mute:#6a707b;--line:rgba(15,17,20,.08);--dark:#f8f8fa;--bn:#3d6bff;--bs:#ff4d2e;--c:#ff4d2e;--on:#fff;--acc:#ff4d2e;--n:#3d6bff;--s:#bd6f00;--r:#0f9a5e;--bad:#e5322d;--glass:rgba(248,248,250,.5);--hi:rgba(255,255,255,.75);--btn:#0f1114;--btnt:#fff;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0c0e;--card:#17181c;--ink:#f3f4f6;--mute:#8b909b;--line:rgba(255,255,255,.09);--dark:#24262b;--bn:color-mix(in srgb,#7a98ff 55%,transparent);--bs:color-mix(in srgb,#ff4d2e 85%,transparent);--n:#7a98ff;--s:#ffb92e;--r:#2dd18a;--bad:#ff6b66;--glass:rgba(40,43,50,.5);--hi:rgba(255,255,255,.18);--btn:#f3f4f6;--btnt:#0f1114}}
-:root[data-theme="dark"]{--bg:#0b0c0e;--card:#17181c;--ink:#f3f4f6;--mute:#8b909b;--line:rgba(255,255,255,.09);--dark:#24262b;--bn:color-mix(in srgb,#7a98ff 55%,transparent);--bs:color-mix(in srgb,#ff4d2e 85%,transparent);--n:#7a98ff;--s:#ffb92e;--r:#2dd18a;--bad:#ff6b66;--glass:rgba(40,43,50,.5);--hi:rgba(255,255,255,.18);--btn:#f3f4f6;--btnt:#0f1114}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0c0e;--card:#17181c;--ink:#f3f4f6;--mute:#8b909b;--line:rgba(255,255,255,.09);--dark:#24262b;--bn:color-mix(in srgb,#7a98ff 55%,transparent);--bs:color-mix(in srgb,#ff4d2e 85%,transparent);--c:#ff6a4d;--on:#0f1114;--n:#7a98ff;--s:#ffb92e;--r:#2dd18a;--bad:#ff6b66;--glass:rgba(40,43,50,.5);--hi:rgba(255,255,255,.18);--btn:#f3f4f6;--btnt:#0f1114}}
+:root[data-theme="dark"]{--bg:#0b0c0e;--card:#17181c;--ink:#f3f4f6;--mute:#8b909b;--line:rgba(255,255,255,.09);--dark:#24262b;--bn:color-mix(in srgb,#7a98ff 55%,transparent);--bs:color-mix(in srgb,#ff4d2e 85%,transparent);--c:#ff6a4d;--on:#0f1114;--n:#7a98ff;--s:#ffb92e;--r:#2dd18a;--bad:#ff6b66;--glass:rgba(40,43,50,.5);--hi:rgba(255,255,255,.18);--btn:#f3f4f6;--btnt:#0f1114}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Bricolage Grotesque",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-variant-numeric:tabular-nums}
 main{max-width:520px;margin:0 auto;padding:16px 16px 120px}
@@ -96,6 +96,19 @@ button{transition:transform .25s cubic-bezier(.2,.8,.2,1),background-color .2s,o
 .top .row2{margin-bottom:10px}.top .row2 input{padding:10px 14px}.top .add{margin-bottom:0;height:54px}
 html{touch-action:pan-x pan-y}
 .top .add{display:flex;align-items:center;justify-content:center;width:fit-content;min-width:200px;padding:0 44px;margin:70px auto 0}
+.top .row2{margin-top:14px}
+.cats{height:264px}
+.wg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:6px 2px 4px}
+.wd{height:50px;border-radius:18px;font-size:15px;font-weight:700;background:color-mix(in srgb,var(--g) 14%,transparent);color:var(--g)}
+.wd.nec{--g:var(--n)}.wd.sva{--g:var(--c)}
+.wd.on{background:var(--g);color:var(--on);transform:scale(1.04);box-shadow:0 0 0 1px color-mix(in srgb,var(--g) 55%,transparent),0 6px 20px color-mix(in srgb,var(--g) 55%,transparent),0 0 38px color-mix(in srgb,var(--g) 40%,transparent);animation:glow .6s ease-out}
+@keyframes glow{from{box-shadow:0 0 0 0 color-mix(in srgb,var(--g) 70%,transparent)}}
+.cats .hint{text-align:center;font-size:13px;color:var(--mute);opacity:1;margin-top:6px;min-height:18px}
+.cats:empty{height:0}
+.seg.sl{position:relative}
+.seg.sl .pl{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:var(--btn);box-shadow:0 2px 10px rgba(0,0,0,.18);transition:transform .45s cubic-bezier(.3,1.3,.5,1)}
+.seg.sl button{position:relative;z-index:1;transition:color .25s}
+.seg.sl .on{background:none;color:var(--btnt);animation:none}
 </style>
 </head>
 <body>
@@ -152,9 +165,9 @@ const hintTxt=()=>{if(F.t!='spesa')return '';const y=+F.d.slice(0,4),m=+F.d.slic
 const dl=d=>d==today()?'Oggi':`${+d.slice(8)} ${MESI[+d.slice(5,7)-1].slice(0,3).toLowerCase()}`;
 function vOggi(){const n=new Date(),s=st(n.getFullYear(),n.getMonth()),sp=F.t=='spesa';
 return `<div class="top"><header class="hd"><div class="mute" style="font-size:15px;font-weight:600">${MESI[n.getMonth()]} ${n.getFullYear()}</div></header>
-<div class="seg"><button class="${sp?'on':''}" data-a="t" data-v="spesa">Spesa</button><button class="${sp?'':'on'}" data-a="t" data-v="entrata">Entrata</button></div>
+<div class="seg sl"><i class="pl" style="transform:translateX(${sp?0:100}%)"></i><button class="${sp?'on':''}" data-a="t" data-v="spesa">Spesa</button><button class="${sp?'':'on'}" data-a="t" data-v="entrata">Entrata</button></div>
 <div class="amtw"><div class="amtbox"><span>€</span><input id="amt" inputmode="decimal" placeholder="0" value="${esc(F.a)}" aria-label="Importo"></div><div class="mute" id="pv" style="padding:0 4px;min-height:20px"></div></div>
-${sp?`<div class="dev"><div class="wv"><div class="band ${CATS.nec.includes(F.c)?'n':'s'}" id="band"></div><div class="wheel" id="wh"><div class="wp"></div>${ALL.map(c=>`<div class="wi ${c==F.c?'on':''}">${c}</div>`).join('')}<div class="wp"></div></div></div><div class="hint" id="hint">${esc(hintTxt())}</div></div>`:''}
+<div class="cats">${sp?`<div class="wg">${ALL.map(c=>`<button class="wd ${CATS.nec.includes(c)?'nec':'sva'} ${c==F.c?'on':''}" data-a="c" data-c="${c}">${c}</button>`).join('')}</div><div class="hint" id="hint">${esc(hintTxt())}</div>`:''}</div>
 <div class="row2"><label class="dchip"><span id="dl">${dl(F.d)}</span><input id="dt" type="date" max="${today()}" value="${F.d}" aria-label="Data"></label><input id="nt" placeholder="Nota (facoltativa)" value="${esc(F.n)}"></div>
 <button class="add" data-a="add">Aggiungi</button>
 </div>`}
@@ -200,6 +213,9 @@ function toast(m){const e=document.createElement('div');e.id='toast';e.textConte
 function initWheel(){const w=$('#wh');if(!w)return;const it=[...w.querySelectorAll('.wi')];w.style.scrollBehavior='auto';w.scrollTop=ALL.indexOf(F.c)*38;let raf;
 w.addEventListener('scroll',()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{const i=Math.max(0,Math.min(ALL.length-1,Math.round(w.scrollTop/38)));if(ALL[i]!=F.c){F.c=ALL[i];it.forEach((x,j)=>x.classList.toggle('on',j==i));$('#band').className='band '+(CATS.nec.includes(F.c)?'n':'s');$('#hint').textContent=hintTxt()}})});
 it.forEach((x,i)=>x.onclick=()=>{w.style.scrollBehavior='smooth';w.scrollTo({top:i*38})})}
+function slide(old,r1,r2){const pl=$('.seg.sl .pl');if(pl){pl.style.transition='none';pl.style.transform=`translateX(${old=='spesa'?0:100}%)`;void pl.offsetWidth;pl.style.transition='';pl.style.transform=`translateX(${F.t=='spesa'?0:100}%)`}
+const f=(s,y)=>{const e=$(s);if(e&&e.animate){const d=y-e.getBoundingClientRect().top;if(d)e.animate([{transform:`translateY(${d}px)`},{transform:'none'}],{duration:450,easing:'cubic-bezier(.22,1,.36,1)'})}};f('.row2',r1);f('.add',r2);
+const c=$('.cats .wg');if(c&&c.animate)c.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:400,easing:'cubic-bezier(.22,1,.36,1)'})}
 function pos(){const nb=document.querySelector('.tb.on'),i=$('#tabs .ind');if(!i)return;if(nb){i.style.opacity=1;i.style.width=nb.offsetWidth+'px';i.style.transform=`translateX(${nb.offsetLeft}px)`}else i.style.opacity=0}
 let tk=0;function pg(){const t=$('.top'),b=$('.below');if(!t||!b)return;const mx=b.offsetTop-40,p=Math.max(0,Math.min(1,mx>0?scrollY/mx:0)),q=Math.max(0,Math.min(1,(p-.25)/.75));
 t.style.opacity=1-Math.min(1,p*1.3);t.style.transform=`translateY(${-p*30}px) scale(${1-.06*p})`;t.style.pointerEvents=p>.5?'none':'';
@@ -213,7 +229,8 @@ if(POP){const a=$('.add');if(a){a.classList.remove('pp');void a.offsetWidth;a.cl
 requestAnimationFrame(()=>$('#tabs .ind').classList.add('rdy'))}
 document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a,d=el.dataset;if(a!='bsave'&&a!='note')CP='';if(a!='rst')RS=false;if(['tab','mese','back','yr','py'].includes(a))ANIM=true;
 if(a=='tab'){tab=d.t;M=d.t=='anno'?new Date().getMonth():null;if(d.t=='anno')Y=cy();if(d.t=='pat')PY=cy();RO=false;scrollTo(0,0)}
-else if(a=='t')F.t=d.v;
+else if(a=='t'){if(F.t==d.v)return;const old=F.t,r1=$('.row2').getBoundingClientRect().top,r2=$('.add').getBoundingClientRect().top;F.t=d.v;render();slide(old,r1,r2);return}
+else if(a=='c')F.c=d.c;
 else if(a=='add'){const v=num(F.a);if(!(v>0)){toast('Inserisci un importo');return}
  if(F.t=='spesa')S.tx.push({id:Date.now(),d:F.d,c:F.c,a:v,n:F.n.trim()});else S.inc.push({id:Date.now(),d:F.d,a:v,n:F.n.trim()});
  save();F.a='';F.n='';toast(F.t=='spesa'?'Spesa aggiunta':'Entrata aggiunta');POP=true}
