@@ -193,9 +193,9 @@ return `<header class="hd"><h1>${Y}</h1></header>${ys.length>1?`<div class="chip
 <div class="lg"><span class="n">● Necessità</span><span class="s">● Svago</span><span class="r">● Risparmi</span></div>${rows}
 <div class="card"><h2>Totale ${Y}</h2><div class="kv"><span>Entrate</span><b>${eur(t[0])}</b></div><div class="kv"><span>Uscite</span><b>${eur(t[1])}</b></div><div class="kv"><span>Risparmi</span><b class="pos">${eur(t[2])}</b></div></div>`}
 function vMese(){const s=st(Y,M),mm=MESI[M].slice(0,3).toLowerCase();
-return `<button class="back" data-a="back">‹ ${Y}</button><header class="hd"><div><h1>${MESI[M]}</h1><div class="mute" style="font-size:15px;margin-top:6px">Uscite totali <b style="color:var(--ink)">${eur(s.nec+s.sva)}</b></div></div></header>
+return `<button class="back" data-a="back">‹ ${Y}</button><header class="hd"><div><h1>${MESI[M]}</h1><div class="mute" style="font-size:15px;margin-top:6px">Entrate <b style="color:var(--ink)">${eur(s.ent)}</b></div><div class="mute" style="font-size:15px;margin-top:2px">Uscite <b style="color:var(--ink)">${eur(s.nec+s.sva)}</b></div></div></header>
 
-<div class="card">${bars(s)}<div class="kv"><span class="mute">Entrate</span><b>${eur(s.ent)}</b></div></div>
+<div class="card">${bars(s)}</div>
 <div class="card"><h2>Per categoria</h2>${NOTE.map(c=>`<div class="kv"><span>${c}</span><b>${eur(s.by[c])}</b></div>`).join('')}</div>
 <div class="card"><h2>Movimenti</h2>${list(items(s))}</div>
 <div class="card"><h2>Spesa + Ristorante a settimana</h2>${s.ws.map((w,i)=>`<div class="kv"><span>${wl(w)} ${mm}</span><b>${eur(s.w[i])}</b></div>`).join('')}</div>
