@@ -191,9 +191,9 @@ function vAnno(){const ys=yrs(),t=[0,0,0];
 const rows=MESI.map((m,i)=>{const s=st(Y,i),b=bad(s);t[0]+=s.ent;t[1]+=s.nec+s.sva;t[2]+=s.ris;return `<button class="mrow ${s.has?'':'emp'}" data-a="mese" data-m="${i}"><div class="mh"><b>${m}</b><span class="mute">Entrate ${eur(s.ent)}</span></div><div class="ps"><span class="pill n ${b.nec?'bd':''}">${eur(s.nec)}</span><span class="pill s ${b.sva?'bd':''}">${eur(s.sva)}</span><span class="pill r ${b.ris?'bd':''}">${eur(s.ris)}</span></div></button>`}).join('');
 return `<header class="hd"><h1>${Y}</h1></header>${ys.length>1?`<div class="chips">${ys.slice().reverse().map(y=>`<button class="chip ${y==Y?'on':''}" data-a="yr" data-y="${y}">${y}</button>`).join('')}</div>`:''}
 <div class="lg"><span class="n">● Necessità</span><span class="s">● Svago</span><span class="r">● Risparmi</span></div>${rows}
-<div class="card"><h2>Totale ${Y}</h2><div class="kv"><span>Entrate</span><b>${eur(t[0])}</b></div><div class="kv"><span>Spese</span><b>${eur(t[1])}</b></div><div class="kv"><span>Risparmi</span><b class="pos">${eur(t[2])}</b></div></div>`}
+<div class="card"><h2>Totale ${Y}</h2><div class="kv"><span>Entrate</span><b>${eur(t[0])}</b></div><div class="kv"><span>Uscite</span><b>${eur(t[1])}</b></div><div class="kv"><span>Risparmi</span><b class="pos">${eur(t[2])}</b></div></div>`}
 function vMese(){const s=st(Y,M),mm=MESI[M].slice(0,3).toLowerCase();
-return `<button class="back" data-a="back">‹ ${Y}</button><header class="hd"><h1>${MESI[M]}</h1></header>
+return `<button class="back" data-a="back">‹ ${Y}</button><header class="hd"><div><h1>${MESI[M]}</h1><div class="mute" style="font-size:15px;margin-top:6px">Uscite totali <b style="color:var(--ink)">${eur(s.nec+s.sva)}</b></div></div></header>
 
 <div class="card">${bars(s)}<div class="kv"><span class="mute">Entrate</span><b>${eur(s.ent)}</b></div></div>
 <div class="card"><h2>Per categoria</h2>${NOTE.map(c=>`<div class="kv"><span>${c}</span><b>${eur(s.by[c])}</b></div>`).join('')}</div>
