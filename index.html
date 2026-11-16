@@ -124,16 +124,24 @@ html{touch-action:pan-x pan-y}
 .kadd.pp{animation:pp .5s cubic-bezier(.3,1.5,.5,1)}
 html,body{height:100%;overflow:hidden}
 main{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);bottom:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+#tabs{left:0;right:0;max-width:none;width:fit-content;margin:0 auto;gap:4px;padding:6px;border-radius:999px;align-items:center}
+.tb{flex:none;width:54px;height:54px;padding:0;gap:0;border-radius:50%;justify-content:center;font-size:0}
+.tb.on{color:var(--btnt)}
+.ind{top:6px;bottom:auto;height:54px;border-radius:50%;background:var(--btn);box-shadow:0 6px 22px color-mix(in srgb,var(--btn) 45%,transparent);backdrop-filter:none;-webkit-backdrop-filter:none}
+.acch{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left}.acch h2{margin:0}
+.chev{width:22px;height:22px;fill:none;stroke:var(--mute);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s cubic-bezier(.3,1.3,.5,1)}.acc.open .chev{transform:rotate(180deg)}
+.accb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.22,1,.36,1)}.acc.open .accb{grid-template-rows:1fr}
+.acci{overflow:hidden;min-height:0;visibility:hidden;transition:visibility .4s}.acc.open .acci{visibility:visible}.acci>:first-child{margin-top:12px}
 </style>
 </head>
 <body>
 <main id="app"></main>
 <nav id="tabs"><i class="ind"></i>
-<button class="tb" data-a="tab" data-t="oggi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Oggi</button>
-<button class="tb" data-a="tab" data-t="anno"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Overview</button>
-<button class="tb" data-a="tab" data-t="pat"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 9 9h-9z"/></svg>Patrimonio</button>
-<button class="tb" data-a="tab" data-t="inv"><svg viewBox="0 0 24 24"><path d="M4 18l5-6 4 3 7-9"/></svg>Investimenti</button>
-<button class="tb" data-a="tab" data-t="imp"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 12h3M11 12h9M4 17h11M19 17h1"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="17" r="2"/></svg>Impostazioni</button>
+<button class="tb" data-a="tab" data-t="oggi" aria-label="Oggi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></button>
+<button class="tb" data-a="tab" data-t="anno" aria-label="Overview"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></button>
+<button class="tb" data-a="tab" data-t="pat" aria-label="Patrimonio"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 9 9h-9z"/></svg></button>
+<button class="tb" data-a="tab" data-t="inv" aria-label="Investimenti"><svg viewBox="0 0 24 24"><path d="M4 18l5-6 4 3 7-9"/></svg></button>
+<button class="tb" data-a="tab" data-t="imp" aria-label="Impostazioni"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 12h3M11 12h9M4 17h11M19 17h1"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="17" r="2"/></svg></button>
 </nav>
 <script>
 const CATS={nec:['Affitto','Spesa','Bollette','Trasporti','Telefono','Altro'],sva:['Ristorante','Viaggi','Shopping','Palestra','Abbonamenti']};
@@ -151,7 +159,7 @@ const cy=()=>new Date().getFullYear();
 const num=s=>{const p=String(s).replace(/\s/g,'').replace(/,/g,'.').split('+').map(parseFloat);return p.some(isNaN)?NaN:Math.round(p.reduce((a,b)=>a+b,0)*100)/100};
 const lab=k=>MESI[+k.slice(5)-1].slice(0,3)+' '+k.slice(2,4),dfmt=d=>`${d.slice(8)}/${d.slice(5,7)}/${d.slice(0,4)}`;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let tab='oggi',Y=cy(),PY=cy(),ANIM=false,POP=false,M=null,RO=false,RS=false,CP='',PD=false,F={t:'spesa',c:'Spesa',d:today(),a:'',n:''},G={f:'val',a:'',d:today(),nl:false,m:'eur',v:'',vd:today()};
+let tab='oggi',Y=cy(),PY=cy(),ANIM=false,POP=false,LP=false,M=null,RO=false,RS=false,CP='',PD=false,F={t:'spesa',c:'Spesa',d:today(),a:'',n:''},G={f:'val',a:'',d:today(),nl:false,m:'eur',v:'',vd:today()};
 function weeks(y,m){const dim=new Date(y,m+1,0).getDate(),r=[];let s=1;for(let d=1;d<=dim;d++){if(new Date(y,m,d).getDay()==0||d==dim){r.push({s,e:d});s=d+1}}return r}
 const wl=w=>w.s==w.e?`${w.s}`:`${w.s}–${w.e}`,wi=(ws,d)=>ws.findIndex(w=>d>=w.s&&d<=w.e);
 function st(y,m){const p=`${y}-${pad(m+1)}`,T=S.tx.filter(t=>t.d.startsWith(p)),I=S.inc.filter(t=>t.d.startsWith(p)),by={},ws=weeks(y,m),w=ws.map(()=>0);
@@ -218,7 +226,7 @@ ${v?`<div class="card"><div class="row2"><input id="vv" inputmode="decimal" plac
 <label class="mute" style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input id="bn" type="checkbox" style="width:auto" ${G.nl?'checked':''}>Già investito prima: non scalare dalla liquidità</label><button class="go" data-a="buy">Aggiungi acquisto</button></div>`}
 <div class="card"><h2>Storico</h2>${r.pts.length?r.pts.slice().reverse().map(({e,cap,val})=>`<div class="li"><div class="g"><div>${e.t=='buy'?'Acquisto'+(e.nl?' precedente':''):'Aggiornamento'}</div><div class="mute">${dfmt(e.d)}${e.t=='val'&&cap>0?` · ${((val-cap)/cap*100).toFixed(1).replace('.',',')}%`:''}</div></div><b>${e.t=='buy'?'+'+eur(e.a):eur(val)}</b><button class="x" aria-label="Elimina" data-a="edel" data-id="${e.id}">✕</button></div>`).join(''):`<p class="mute">Vuoto.</p>`}</div>`}
 function vImp(){return `<header class="hd"><h1>Impostazioni</h1></header>
-<div class="card"><h2>Liquidità di partenza</h2><p class="mute">La liquidità che avevi prima di iniziare a usare l’app. Si inserisce una sola volta, al primo utilizzo.</p><input id="base" inputmode="decimal" value="${S.base||0}" aria-label="Liquidità di partenza"></div>
+<div class="card acc ${LP?'open':''}"><button class="acch" data-a="lp" aria-expanded="${LP}"><h2>Liquidità di partenza</h2><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="accb"><div class="acci"><p class="mute">La liquidità che avevi prima di iniziare a usare l’app. Si inserisce una sola volta, al primo utilizzo.</p><input id="base" inputmode="decimal" value="${S.base||0}" aria-label="Liquidità di partenza"></div></div></div>
 <div class="card"><h2>Backup dei dati</h2><p class="mute">I dati sono salvati solo su questo dispositivo. Salva copia una stringa da conservare, per esempio in Note.</p><button class="go" data-a="bsave">Salva</button><div style="height:10px"></div><button class="go sec" data-a="brest">Ripristina</button>
 ${RO?`<div style="height:10px"></div><textarea id="bk" rows="4" placeholder="Incolla qui la stringa salvata"></textarea><div style="height:10px"></div><button class="go" data-a="bgo">Conferma ripristino</button>`:''}
 ${CP?`<p class="mute">Copia non riuscita: seleziona e copia a mano.</p><textarea readonly rows="3">${esc(CP)}</textarea>`:''}</div>
@@ -251,6 +259,7 @@ else if(a=='t'){if(F.t==d.v)return;const old=F.t,r1=$('.row2').getBoundingClient
 else if(a=='c')F.c=d.c;
 else if(a=='menu'){$('#menu').classList.toggle('open');return}
 else if(a=='k'){key(d.k);return}
+else if(a=='lp'){LP=!LP;el.closest('.acc').classList.toggle('open',LP);el.setAttribute('aria-expanded',LP);return}
 else if(a=='add'){const v=num(F.a.replace(/\+$/,''));if(!(v>0)){toast('Inserisci un importo');return}
  if(F.t=='spesa')S.tx.push({id:Date.now(),d:F.d,c:F.c,a:v,n:F.n.trim()});else S.inc.push({id:Date.now(),d:F.d,a:v,n:F.n.trim()});
  save();F.a='';F.n='';toast(F.t=='spesa'?'Uscita aggiunta':'Entrata aggiunta');POP=true}
