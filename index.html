@@ -142,6 +142,10 @@ main{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);bottom:0;ove
 .bb b{display:block;font-size:15px}.bb small{font-size:11px;opacity:.7}
 @keyframes dr{to{stroke-dashoffset:0}}@keyframes fi{from{opacity:0}}
 @media (prefers-reduced-motion:reduce){.cw.an .ln{stroke-dashoffset:0}}
+.bb{opacity:0;transition:left .3s cubic-bezier(.22,1,.36,1),top .3s cubic-bezier(.22,1,.36,1),opacity .2s}.bb.on{opacity:1}
+.mvl{max-height:310px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}.mvl::-webkit-scrollbar{display:none}
+.mvl.sc{-webkit-mask-image:linear-gradient(#000 calc(100% - 16px),transparent);mask-image:linear-gradient(#000 calc(100% - 16px),transparent)}
+.mvl .li{height:62px;flex:none}.mvl .g>div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -215,7 +219,7 @@ return `<button class="back" data-a="back">‹ ${Y}</button><header class="hd"><
 
 <div class="card">${bars(s)}</div>
 <div class="card"><h2>Per categoria</h2>${NOTE.map(c=>`<div class="kv"><span>${c}</span><b>${eur(s.by[c])}</b></div>`).join('')}</div>
-<div class="card"><h2>Movimenti</h2>${list(items(s))}</div>
+<div class="card"><h2>Movimenti</h2><div class="mvl ${items(s).length>5?'sc':''}">${list(items(s))}</div></div>
 <div class="card"><h2>Spesa + Ristorante a settimana</h2>${s.ws.map((w,i)=>`<div class="kv"><span>${wl(w)} ${mm}</span><b>${eur(s.w[i])}</b></div>`).join('')}</div>
 <button class="go" data-a="note">Copia come nota</button>${CP?`<textarea readonly rows="8" style="margin-top:14px">${esc(CP)}</textarea>`:''}`}
 function vPat(){const ys=yrs(),p=pat(PY);const tot=Math.max(p.liq,0)+Math.max(p.val,0)||1;
@@ -267,8 +271,10 @@ const vs=ps.map(x=>x.v);let lo=Math.min(...vs),hi=Math.max(...vs);if(hi==lo){hi+
 const Y=v=>T+(hi-v)/(hi-lo)*(H-T-B);ps.forEach(x=>x.y=Y(x.v));
 const d=n>1?curve(ps):'',zero=lo<0&&hi>0?`<line class="zl" x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}"/><text class="tx" x="${L}" y="${Y(0)-5}">0%</text>`:'';
 w.className='cw'+(an?' an':'');w.style.setProperty('--lc',ps[n-1].v>=0?'var(--r)':'var(--bad)');
-w.innerHTML=`<svg viewBox="0 0 ${W} ${H}" class="ch" role="img" aria-label="Variazione percentuale degli investimenti"><defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--lc);stop-opacity:.28"/><stop offset="1" style="stop-color:var(--lc);stop-opacity:0"/></linearGradient></defs>${zero}${n>1?`<path class="ar" d="${d}L${ps[n-1].x},${H-B}L${ps[0].x},${H-B}Z" fill="url(#gr)"/><path class="ln" pathLength="1" d="${d}"/>`:''}<g id="dg"></g><text class="tx" x="${L}" y="${H-6}">${cdf(ps[0].d)}</text>${n>1?`<text class="tx" x="${W-R}" y="${H-6}" text-anchor="end">${cdf(ps[n-1].d)}</text>`:''}</svg><div class="bb" id="bb"></div>`;csel(n-1)}
-function csel(i){const x=CHP[i];$('#dg').innerHTML=CHP.map((q,j)=>`<circle class="dt ${j==i?'on':''}" cx="${q.x}" cy="${q.y}" r="${j==i?6:3.5}"/>`).join('');const b=$('#bb');b.innerHTML=`<b>${cpf(x.v)}</b><small>${cdf(x.d)}</small>`;b.style.left=Math.max(12,Math.min(88,x.x/320*100))+'%';b.style.top=(x.y/170*100)+'%'}
+w.innerHTML=`<svg viewBox="0 0 ${W} ${H}" class="ch" role="img" aria-label="Variazione percentuale degli investimenti"><defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--lc);stop-opacity:.28"/><stop offset="1" style="stop-color:var(--lc);stop-opacity:0"/></linearGradient></defs>${zero}${n>1?`<path class="ar" d="${d}L${ps[n-1].x},${H-B}L${ps[0].x},${H-B}Z" fill="url(#gr)"/><path class="ln" pathLength="1" d="${d}"/>`:''}<g id="dg"></g><text class="tx" x="${L}" y="${H-6}">${cdf(ps[0].d)}</text>${n>1?`<text class="tx" x="${W-R}" y="${H-6}" text-anchor="end">${cdf(ps[n-1].d)}</text>`:''}</svg><div class="bb" id="bb"></div>`;csel(-1)}
+let CT=0;function csel(i){clearTimeout(CT);$('#dg').innerHTML=CHP.map((q,j)=>`<circle class="dt ${j==i?'on':''}" cx="${q.x}" cy="${q.y}" r="${j==i?6:3.5}"/>`).join('');const b=$('#bb');if(i<0){b.classList.remove('on');return}const x=CHP[i];b.innerHTML=`<b>${cpf(x.v)}</b><small>${cdf(x.d)}</small>`;b.style.left=Math.max(12,Math.min(88,x.x/320*100))+'%';b.style.top=(x.y/170*100)+'%';b.classList.add('on')}
+function cend(){if(!CHP.length||!$('#dg'))return;clearTimeout(CT);CT=setTimeout(()=>{if($('#dg'))csel(-1)},1400)}
+document.addEventListener('pointerup',cend);document.addEventListener('pointercancel',cend);
 function cpick(e){const w=e.target.closest&&e.target.closest('#cw');if(!w||!CHP.length||!$('#dg'))return;const r=w.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*320;let b=0,m=1e9;CHP.forEach((q,i)=>{const k=Math.abs(q.x-x);if(k<m){m=k;b=i}});csel(b)}
 document.addEventListener('pointerdown',cpick);document.addEventListener('pointermove',e=>{if(e.pressure>0||e.pointerType=='mouse')cpick(e)});
 function pos(){const nb=document.querySelector('.tb.on'),i=$('#tabs .ind');if(!i)return;if(nb){i.style.opacity=1;i.style.width=nb.offsetWidth+'px';i.style.transform=`translateX(${nb.offsetLeft}px)`}else i.style.opacity=0}
