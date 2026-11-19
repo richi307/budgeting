@@ -146,6 +146,19 @@ main{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);bottom:0;ove
 .mvl{max-height:310px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}.mvl::-webkit-scrollbar{display:none}
 .mvl.sc{-webkit-mask-image:linear-gradient(#000 calc(100% - 16px),transparent);mask-image:linear-gradient(#000 calc(100% - 16px),transparent)}
 .mvl .li{height:62px;flex:none}.mvl .g>div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ri{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.ri .g{flex:1;min-width:0;text-align:left}.ri small{display:block;color:var(--mute);font-size:12px}.ri .am{font-weight:800}.ri.off .g,.ri.off .am{opacity:.45}
+.rdot{width:10px;height:10px;border-radius:50%;background:var(--g);flex:none}.rdot.nec,.pb2.nec{--g:var(--n)}.rdot.sva,.pb2.sva{--g:var(--c)}
+.rsw{position:relative;flex:none;width:46px;height:28px;border-radius:14px;background:var(--line);transition:background .3s}.rsw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25);transition:transform .35s cubic-bezier(.3,1.5,.5,1)}.rsw.on{background:var(--r)}.rsw.on::after{transform:translateX(18px)}
+.rx{color:var(--mute);padding:4px 6px}
+.rtag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;white-space:nowrap;background:color-mix(in srgb,var(--r) 16%,transparent);color:var(--r)}.rtag.p{background:color-mix(in srgb,var(--s) 26%,transparent);color:var(--s)}
+@media (prefers-color-scheme:light){.rtag.p{color:#c97800}}
+.red{padding:2px 0 14px}.red .row2{margin:8px 0}.eb{display:flex;gap:10px}
+.rtot{display:flex;justify-content:space-between;padding:12px 0 4px;border-top:1px solid var(--line);font-weight:700}
+.rfrm{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.pb2{display:flex;align-items:center;gap:10px;width:100%;padding:12px 16px;border-radius:16px;background:var(--bg);font-weight:700;text-align:left;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--g) 50%,transparent)}
+.pop{position:fixed;z-index:60;overflow:auto;padding:6px;border-radius:22px;background:color-mix(in srgb,var(--card) 84%,transparent);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.24);opacity:0;pointer-events:none;transform:scale(.94);transition:transform .4s cubic-bezier(.3,1.3,.5,1),opacity .2s}.pop.open{opacity:1;pointer-events:auto;transform:none}.pop hr{border:0;border-top:1px solid var(--line);margin:4px 8px}
+.ri .g{display:flex;flex-direction:column;align-items:flex-start}.ri .g .rtag{margin:3px 0 0}
+.acci input:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--n)}
 </style>
 </head>
 <body>
@@ -157,11 +170,12 @@ main{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);bottom:0;ove
 <button class="tb" data-a="tab" data-t="inv" aria-label="Investimenti"><svg viewBox="0 0 24 24"><path d="M4 18l5-6 4 3 7-9"/></svg></button>
 <button class="tb" data-a="tab" data-t="imp" aria-label="Impostazioni"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 12h3M11 12h9M4 17h11M19 17h1"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="17" r="2"/></svg></button>
 </nav>
+<div class="pop" id="pop"></div>
 <script>
 const CATS={nec:['Affitto','Spesa','Bollette','Trasporti','Telefono','Altro'],sva:['Ristorante','Viaggi','Shopping','Palestra','Abbonamenti']};
 const ALL=[...CATS.nec,...CATS.sva],NOTE=['Affitto','Spesa','Bollette','Trasporti','Telefono','Altro','Ristorante','Viaggi','Shopping','Palestra','Abbonamenti'];
 const MESI=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-const DEF=()=>({base:0,tx:[],inc:[],ev:[]});
+const DEF=()=>({base:0,tx:[],inc:[],ev:[],rec:[]});
 function mig(o){const r=Object.assign(DEF(),o);if(r.salary!==undefined||r.inv||r.years||r.liq){let n=0;Object.keys(r.inv||{}).forEach(k=>r.ev.push({id:Date.now()+n++,t:'val',d:k+'-28',v:r.inv[k]}));if(r.cap>0)r.ev.push({id:1,t:'buy',d:'2000-01-01',a:r.cap,nl:1});
 const k=Object.keys(r.years||{}).filter(y=>r.years[y].liq!=null).sort()[0];if(k)r.base=r.years[k].liq;else if(r.liq)r.base=r.liq;['salary','cap','liq','inv','years'].forEach(k=>delete r[k])}return r}
 let S=DEF();try{const j=localStorage.getItem('spese-v1');if(j)S=mig(JSON.parse(j))}catch(e){}
@@ -173,7 +187,7 @@ const cy=()=>new Date().getFullYear();
 const num=s=>{const p=String(s).replace(/\s/g,'').replace(/,/g,'.').split('+').map(parseFloat);return p.some(isNaN)?NaN:Math.round(p.reduce((a,b)=>a+b,0)*100)/100};
 const lab=k=>MESI[+k.slice(5)-1].slice(0,3)+' '+k.slice(2,4),dfmt=d=>`${d.slice(8)}/${d.slice(5,7)}/${d.slice(0,4)}`;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let tab='oggi',Y=cy(),PY=cy(),ANIM=false,POP=false,LP=false,M=null,RO=false,RS=false,CP='',PD=false,F={t:'spesa',c:'Spesa',d:today(),a:'',n:''},G={f:'val',a:'',d:today(),nl:false,m:'eur',v:'',vd:today()};
+let tab='oggi',Y=cy(),PY=cy(),ANIM=false,POP=false,LP=false,RC=false,RE=0,RF='Affitto',rseq=0,M=null,RO=false,RS=false,CP='',PD=false,F={t:'spesa',c:'Spesa',d:today(),a:'',n:''},G={f:'val',a:'',d:today(),nl:false,m:'eur',v:'',vd:today()};
 function weeks(y,m){const dim=new Date(y,m+1,0).getDate(),r=[];let s=1;for(let d=1;d<=dim;d++){if(new Date(y,m,d).getDay()==0||d==dim){r.push({s,e:d});s=d+1}}return r}
 const wl=w=>w.s==w.e?`${w.s}`:`${w.s}–${w.e}`,wi=(ws,d)=>ws.findIndex(w=>d>=w.s&&d<=w.e);
 function st(y,m){const p=`${y}-${pad(m+1)}`,T=S.tx.filter(t=>t.d.startsWith(p)),I=S.inc.filter(t=>t.d.startsWith(p)),by={},ws=weeks(y,m),w=ws.map(()=>0);
@@ -184,7 +198,7 @@ const bad=s=>({nec:s.ent>0&&s.nec>s.ent*.5+.005,sva:s.ent>0&&s.sva>s.ent*.3+.005
 const bar=(k,l,v,t,b)=>`<div class="br"><div class="rw"><span>${l}</span><b class="${b?'bad':''}">${eur(v)} <i>/ ${eur(t)}</i></b></div><div class="tr"><div class="fl ${k} ${b?'bd':''}" style="width:${t>0?Math.max(0,Math.min(100,v/t*100)):0}%"></div></div></div>`;
 const bars=s=>{const b=bad(s);return (s.ent>0?'':`<p class="mute">Aggiungi le entrate del mese per calcolare gli obiettivi.</p>`)+bar('nec','Necessità 50%',s.nec,s.ent*.5,b.nec)+bar('sva','Svago 30%',s.sva,s.ent*.3,b.sva)+bar('ris','Risparmi 20%',s.ris,s.ent*.2,b.ris)};
 const items=s=>[...s.T.map(t=>({...t,k:'tx'})),...s.I.map(t=>({...t,k:'inc',c:'Entrata'}))].sort((a,b)=>b.d.localeCompare(a.d)||b.id-a.id);
-const list=arr=>arr.length?arr.map(t=>`<div class="li"><div class="g"><div>${t.c}${t.n?` <span class="mute">${esc(t.n)}</span>`:''}</div><div class="mute">${t.d.slice(8)}/${t.d.slice(5,7)}</div></div><b class="${t.k=='inc'?'pos':''}">${t.k=='inc'?'+':''}${eur(t.a)}</b><button class="x" aria-label="Elimina" data-a="del" data-k="${t.k}" data-id="${t.id}">✕</button></div>`).join(''):`<p class="mute">Ancora nessun movimento.</p>`;
+const list=arr=>arr.length?arr.map(t=>`<div class="li"><div class="g"><div>${t.c}${t.rid?'<span class="rtag">ricorrente</span>':''}${t.n?` <span class="mute">${esc(t.n)}</span>`:''}</div><div class="mute">${t.d.slice(8)}/${t.d.slice(5,7)}</div></div><b class="${t.k=='inc'?'pos':''}">${t.k=='inc'?'+':''}${eur(t.a)}</b><button class="x" aria-label="Elimina" data-a="del" data-k="${t.k}" data-id="${t.id}">✕</button></div>`).join(''):`<p class="mute">Ancora nessun movimento.</p>`;
 function replay(u){const ev=S.ev.slice().sort((a,b)=>a.d.localeCompare(b.d)||a.id-b.id);let cap=0,val=0,hv=false;const pts=[];
 for(const e of ev){if(u&&e.d>u)break;if(e.t=='buy'){cap+=e.a;if(!hv)val+=e.a}else{hv=true;val=e.pct!=null?cap*(1+e.pct/100):e.v}pts.push({e,cap,val})}return{cap,val,pts}}
 /* anni: dal primo con spese/entrate fino a quello corrente */
@@ -241,7 +255,7 @@ ${v?`<div class="card"><div class="row2"><input id="vv" inputmode="decimal" plac
 <label class="mute" style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input id="bn" type="checkbox" style="width:auto" ${G.nl?'checked':''}>Già investito prima: non scalare dalla liquidità</label><button class="go" data-a="buy">Aggiungi acquisto</button></div>`}
 <div class="card"><h2>Storico</h2>${r.pts.length?r.pts.slice().reverse().map(({e,cap,val})=>`<div class="li"><div class="g"><div>${e.t=='buy'?'Acquisto'+(e.nl?' precedente':''):'Aggiornamento'}</div><div class="mute">${dfmt(e.d)}${e.t=='val'&&cap>0?` · ${((val-cap)/cap*100).toFixed(1).replace('.',',')}%`:''}</div></div><b>${e.t=='buy'?'+'+eur(e.a):eur(val)}</b><button class="x" aria-label="Elimina" data-a="edel" data-id="${e.id}">✕</button></div>`).join(''):`<p class="mute">Vuoto.</p>`}</div>`}
 function vImp(){return `<header class="hd"><h1>Impostazioni</h1></header>
-<div class="card acc ${LP?'open':''}"><button class="acch" data-a="lp" aria-expanded="${LP}"><h2>Liquidità di partenza</h2><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="accb"><div class="acci"><p class="mute">La liquidità che avevi prima di iniziare a usare l’app. Si inserisce una sola volta, al primo utilizzo.</p><input id="base" inputmode="decimal" value="${S.base||0}" aria-label="Liquidità di partenza"></div></div></div>
+${recHTML()}<div class="card acc ${LP?'open':''}"><button class="acch" data-a="lp" aria-expanded="${LP}"><h2>Liquidità di partenza</h2><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="accb"><div class="acci"><p class="mute">La liquidità che avevi prima di iniziare a usare l’app. Si inserisce una sola volta, al primo utilizzo.</p><input id="base" inputmode="decimal" value="${S.base||0}" aria-label="Liquidità di partenza"></div></div></div>
 <div class="card"><h2>Backup dei dati</h2><p class="mute">I dati sono salvati solo su questo dispositivo. Salva copia una stringa da conservare, per esempio in Note.</p><button class="go" data-a="bsave">Salva</button><div style="height:10px"></div><button class="go sec" data-a="brest">Ripristina</button>
 ${RO?`<div style="height:10px"></div><textarea id="bk" rows="4" placeholder="Incolla qui la stringa salvata"></textarea><div style="height:10px"></div><button class="go" data-a="bgo">Conferma ripristino</button>`:''}
 ${CP?`<p class="mute">Copia non riuscita: seleziona e copia a mano.</p><textarea readonly rows="3">${esc(CP)}</textarea>`:''}</div>
@@ -277,23 +291,46 @@ function cend(){if(!CHP.length||!$('#dg'))return;clearTimeout(CT);CT=setTimeout(
 document.addEventListener('pointerup',cend);document.addEventListener('pointercancel',cend);
 function cpick(e){const w=e.target.closest&&e.target.closest('#cw');if(!w||!CHP.length||!$('#dg'))return;const r=w.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*320;let b=0,m=1e9;CHP.forEach((q,i)=>{const k=Math.abs(q.x-x);if(k<m){m=k;b=i}});csel(b)}
 document.addEventListener('pointerdown',cpick);document.addEventListener('pointermove',e=>{if(e.pressure>0||e.pointerType=='mouse')cpick(e)});
+const nk=k=>{let y=+k.slice(0,4),m=+k.slice(5)+1;if(m>12){m=1;y++}return `${y}-${pad(m)}`},ck=()=>today().slice(0,7);
+const rplan=p=>p.rev[p.rev.length-1],rcur=(p,k)=>{let r=null;p.rev.forEach(x=>{if(x.f<=k)r=x});return r},rg=c=>CATS.nec.includes(c)?'nec':'sva',rfind=id=>S.rec.find(x=>x.id==id);
+function rset(p,patch){const k=nk(ck()),r={...rplan(p),...patch,f:k};p.rev=p.rev.filter(x=>x.f!=k);p.rev.push(r);p.rev.sort((a,b)=>a.f<b.f?-1:1);save()}
+/* il 1° di ogni mese aggiunge le ricorrenti; recupera anche i mesi in cui l'app non è stata aperta */
+function recRun(){const k=ck();let ch=false;(S.rec||[]).forEach(p=>{let m=nk(p.last),g=0;while(m<=k&&g++<240){const r=rcur(p,m);if(r&&r.on){S.tx.push({id:Date.now()+(rseq++),d:m+'-01',c:p.c,a:r.a,n:r.n,rid:p.id});ch=true}m=nk(m)}if(p.last<k){p.last=k;ch=true}});if(ch)save();return ch}
+function recHTML(){const k=ck(),n1=nk(k),dd='01/'+n1.slice(5),R=S.rec||[],mn=MESI[+n1.slice(5)-1].toLowerCase();
+const row=p=>{const pl=rplan(p),cu=rcur(p,k),pend=pl.f>k;return `<div class="ri ${pl.on?'':'off'}"><span class="rdot ${rg(p.c)}"></span><button class="g" data-a="red" data-id="${p.id}"><b>${p.c}</b>${pend?`<span class="rtag p">${cu?'dal '+dd:'parte dal '+dd}</span>`:''}${pl.n?`<small>${esc(pl.n)}</small>`:''}</button><b class="am">${eur(pl.a)}</b><button class="rsw ${pl.on?'on':''}" data-a="rsw" data-id="${p.id}" aria-label="Attiva o sospendi dal mese successivo"></button><button class="rx" data-a="rdel" data-id="${p.id}" aria-label="Elimina">✕</button></div>${RE==p.id?`<div class="red"><p class="mute" style="margin:0">Vale dal ${dd}.</p><div class="row2"><input id="ea" inputmode="decimal" value="${pl.a}" aria-label="Importo"><input id="en" value="${esc(pl.n)}" placeholder="Nota" aria-label="Nota"></div><div class="eb"><button class="go sec" data-a="recan">Annulla</button><button class="go" data-a="resave" data-id="${p.id}">Salva</button></div></div>`:''}`};
+return `<div class="card acc ${RC?'open':''}"><button class="acch" data-a="rc" aria-expanded="${RC}"><h2>Spese ricorrenti</h2><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="accb"><div class="acci"><p class="mute">Si aggiungono il 1° di ogni mese come normali uscite. Ogni modifica vale dal mese successivo: il mese in corso e i precedenti non cambiano.</p>${R.length?R.map(row).join(''):'<p class="mute">Nessuna spesa ricorrente.</p>'}<div class="rtot"><span>Totale al mese, da ${mn}</span><b>${eur(R.filter(p=>rplan(p).on).reduce((s,p)=>s+rplan(p).a,0))}</b></div><div class="rfrm"><button class="pb2 ${rg(RF)}" id="fb" data-a="rmenu"><span class="rdot ${rg(RF)}"></span>${RF}</button><div class="row2" style="margin-top:10px"><input id="fa" inputmode="decimal" placeholder="€ importo" aria-label="Importo"><input id="fn" placeholder="Nota (facoltativa)" aria-label="Nota"></div><button class="go" data-a="radd">Aggiungi ricorrente</button></div></div></div></div>`}
+function openPop(b){const r=b.getBoundingClientRect(),p=$('#pop');p.innerHTML=ALL.map((c,i)=>`${i==6?'<hr>':''}<button class="mi ${rg(c)}" data-a="rpick" data-c="${c}"><span class="dot"></span>${c}${c==RF?'<em>✓</em>':''}</button>`).join('');
+const below=innerHeight-r.bottom-16,above=r.top-16,down=below>=Math.min(300,above);p.style.left=r.left+'px';p.style.width=r.width+'px';p.style.maxHeight=Math.min(340,down?below:above)+'px';
+if(down){p.style.top=r.bottom+6+'px';p.style.bottom='auto';p.style.transformOrigin='top'}else{p.style.bottom=innerHeight-r.top+6+'px';p.style.top='auto';p.style.transformOrigin='bottom'}p.classList.add('open')}
+const closePop=()=>{const p=$('#pop');if(p)p.classList.remove('open')};
+addEventListener('scroll',e=>{if(e.target.id!='pop')closePop()},true);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&recRun())render()});
 function pos(){const nb=document.querySelector('.tb.on'),i=$('#tabs .ind');if(!i)return;if(nb){i.style.opacity=1;i.style.width=nb.offsetWidth+'px';i.style.transform=`translateX(${nb.offsetLeft}px)`}else i.style.opacity=0}
 let tk=0;function pg(){const t=$('.top'),b=$('.below');if(!t||!b)return;const mx=b.offsetTop-40,p=Math.max(0,Math.min(1,mx>0?scrollY/mx:0)),q=Math.max(0,Math.min(1,(p-.25)/.75));
 t.style.opacity=1-Math.min(1,p*1.3);t.style.transform=`translateY(${-p*30}px) scale(${1-.06*p})`;t.style.pointerEvents=p>.5?'none':'';
 b.style.opacity=q;b.style.transform=`translateY(${(1-q)*50}px) scale(${.96+.04*q})`;b.style.pointerEvents=q<.5?'none':''}
 function countUp(){document.querySelectorAll('.big[data-v]').forEach(e=>{const v=+e.dataset.v,t0=performance.now(),f=n=>{const k=Math.min(1,(n-t0)/700);e.textContent=eur(v*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)})}
-function render(){const v=tab=='anno'&&M!==null?vMese():({oggi:vOggi,anno:vAnno,pat:vPat,inv:vInv,imp:vImp})[tab](),app=$('#app');app.innerHTML=v;
+function render(){closePop();const v=tab=='anno'&&M!==null?vMese():({oggi:vOggi,anno:vAnno,pat:vPat,inv:vInv,imp:vImp})[tab](),app=$('#app');app.innerHTML=v;
 document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',b.dataset.t==tab));document.documentElement.classList.toggle('snap',tab=='oggi');
 pos();initWheel();pg();cbuild();
 if(ANIM){app.classList.remove('pgin');void app.offsetWidth;app.classList.add('pgin');ANIM=false}
 if(POP){const a=$('.kadd');if(a){a.classList.remove('pp');void a.offsetWidth;a.classList.add('pp')}POP=false}
 requestAnimationFrame(()=>$('#tabs .ind').classList.add('rdy'))}
-document.addEventListener('click',e=>{const mn=$('#menu');if(mn&&!e.target.closest('.pm'))mn.classList.remove('open');const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a,d=el.dataset;if(a!='bsave'&&a!='note')CP='';if(a!='rst')RS=false;if(['tab','mese','back','yr','py'].includes(a))ANIM=true;
+document.addEventListener('click',e=>{const mn=$('#menu');if(mn&&!e.target.closest('.pm'))mn.classList.remove('open');if(!e.target.closest('#pop')&&!e.target.closest('#fb'))closePop();const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a,d=el.dataset;if(a!='bsave'&&a!='note')CP='';if(a!='rst')RS=false;if(['tab','mese','back','yr','py'].includes(a))ANIM=true;
 if(a=='tab'){tab=d.t;M=d.t=='anno'?new Date().getMonth():null;if(d.t=='anno')Y=cy();if(d.t=='pat')PY=cy();RO=false;$('#app').scrollTop=0}
 else if(a=='t'){if(F.t==d.v)return;const old=F.t,r1=$('.row2').getBoundingClientRect().top,r2=$('.kp').getBoundingClientRect().top;F.t=d.v;render();slide(old,r1,r2);return}
 else if(a=='c')F.c=d.c;
 else if(a=='menu'){$('#menu').classList.toggle('open');return}
 else if(a=='k'){key(d.k);return}
+else if(a=='rc'){RC=!RC;el.closest('.acc').classList.toggle('open',RC);el.setAttribute('aria-expanded',RC);return}
+else if(a=='rmenu'){$('#pop').classList.contains('open')?closePop():openPop(el);return}
+else if(a=='rpick'){RF=d.c;closePop()}
+else if(a=='rsw'){const p=rfind(d.id);rset(p,{on:rplan(p).on?0:1});toast('Vale dal 01/'+nk(ck()).slice(5)+': questo mese non cambia')}
+else if(a=='rdel'){S.rec=S.rec.filter(x=>x.id!=d.id);save();toast('Non verrà più aggiunta. I movimenti già presenti restano')}
+else if(a=='red')RE=RE==+d.id?0:+d.id;
+else if(a=='recan')RE=0;
+else if(a=='resave'){const v=num($('#ea').value);if(!(v>0)){toast('Inserisci un importo');return}rset(rfind(d.id),{a:v,n:$('#en').value.trim()});RE=0;toast('Nuovo valore dal 01/'+nk(ck()).slice(5))}
+else if(a=='radd'){const v=num($('#fa').value);if(!(v>0)){toast('Inserisci un importo');return}S.rec.push({id:Date.now()+(rseq++),c:RF,last:ck(),rev:[{f:nk(ck()),a:v,n:$('#fn').value.trim(),on:1}]});save();toast('Parte dal 01/'+nk(ck()).slice(5)+': questo mese non cambia')}
 else if(a=='lp'){LP=!LP;el.closest('.acc').classList.toggle('open',LP);el.setAttribute('aria-expanded',LP);return}
 else if(a=='add'){const v=num(F.a.replace(/\+$/,''));if(!(v>0)){toast('Inserisci un importo');return}
  if(F.t=='spesa')S.tx.push({id:Date.now(),d:F.d,c:F.c,a:v,n:F.n.trim()});else S.inc.push({id:Date.now(),d:F.d,a:v,n:F.n.trim()});
@@ -312,7 +349,7 @@ else if(a=='edel'){S.ev=S.ev.filter(x=>x.id!=d.id);save()}
 else if(a=='bsave'){copy(enc()).then(ok=>{if(ok)toast('Stringa copiata');else{CP=enc();render()}});return}
 else if(a=='brest')RO=!RO;
 else if(a=='rst'){if(!RS)RS=true;else{S=DEF();save();RS=false;G.f='val';toast('Dati cancellati')}}
-else if(a=='bgo'){try{const s=$('#bk').value.trim();let o;try{o=JSON.parse(decodeURIComponent(escape(atob(s))))}catch(x){o=JSON.parse(s)}S=mig(o);save();RO=false;toast('Dati ripristinati')}catch(x){toast('Stringa non valida');return}}
+else if(a=='bgo'){try{const s=$('#bk').value.trim();let o;try{o=JSON.parse(decodeURIComponent(escape(atob(s))))}catch(x){o=JSON.parse(s)}S=mig(o);recRun();save();RO=false;toast('Dati ripristinati')}catch(x){toast('Stringa non valida');return}}
 render()});
 document.addEventListener('input',e=>{const t=e.target,v=t.value;
 if(t.id=='amt'){F.a=v;const n=num(v);$('#pv').textContent=v.includes('+')&&!isNaN(n)?'= '+eur(n):''}
@@ -324,6 +361,7 @@ else if(t.id=='bdt')G.d=t.value||today();else if(t.id=='vd')G.vd=t.value||today(
 else if(t.id=='base'){const n=num(t.value);S.base=isNaN(n)?0:n;save();render()}});
 addEventListener('scroll',()=>{cancelAnimationFrame(tk);tk=requestAnimationFrame(pg)},{passive:true});addEventListener('load',pos);addEventListener('resize',pos);
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
+recRun();
 render();
 </script>
 <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script>
